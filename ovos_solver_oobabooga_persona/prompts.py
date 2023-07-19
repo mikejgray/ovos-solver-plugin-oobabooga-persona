@@ -1,8 +1,8 @@
-from ovos_solver_openai_persona.engines import OpenAICompletionsSolver
+from ovos_solver_oobabooga_persona.engines import OobaboogaChatCompletionsSolver
 
 
-# Voice Assistant Promp Engineering
-class OpenAIPersonaPromptSolver(OpenAICompletionsSolver):
+# Voice Assistant Prompt Engineering
+class OpenAIPersonaPromptSolver(OobaboogaChatCompletionsSolver):
     def __init__(self, config=None):
         config = config or {}
         config["model"] = "text-davinci-03"
@@ -18,23 +18,25 @@ class OpenAIPersonaPromptSolver(OpenAICompletionsSolver):
         # TODO - intro question from skill settings
         intro_q = ("Hello, who are you?", "I am an AI created by OpenAI. How can I help you today?")
         if len(self.qa_pairs) > self.max_utts:
-            qa = [intro_q] + self.qa_pairs[-1 * self.max_utts:]
+            qa = [intro_q] + self.qa_pairs[-1 * self.max_utts :]
         else:
             qa = [intro_q] + self.qa_pairs
 
         persona = persona or self.config.get("persona") or self.default_persona
-        initial_prompt = f"The following is a conversation with an AI assistant. " \
-                         f"The assistant understands all languages. " \
-                         f"The assistant gives short and factual answers. " \
-                         f"The assistant answers in the same language the question was asked. " \
-                         f"The assistant is {persona}"
+        initial_prompt = (
+            f"The following is a conversation with an AI assistant. "
+            f"The assistant understands all languages. "
+            f"The assistant gives short and factual answers. "
+            f"The assistant answers in the same language the question was asked. "
+            f"The assistant is {persona}"
+        )
         chat = initial_prompt.strip() + "\n\n"
         if qa:
             qa = "\n".join([f"Human: {q}\nAI: {a}" for q, a in qa])
             if chat.endswith("\nHuman: "):
-                chat = chat[-1 * len("\nHuman: "):]
+                chat = chat[-1 * len("\nHuman: ") :]
             if chat.endswith("\nAI: "):
-                chat += f"Please rephrase the question\n"
+                chat += "Please rephrase the question\n"
             chat += qa
         return chat
 
@@ -60,4 +62,3 @@ class OpenAIPersonaPromptSolver(OpenAICompletionsSolver):
         if self.memory:
             self.qa_pairs.append((query, answer))
         return answer
-
